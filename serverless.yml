@@ -1,0 +1,65 @@
+service: ethSenderService
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1 
+  environment:
+    DYNAMODB_TABLE: ${env:DYNAMODB_TABLE}
+    INFURA_PROJECT_ID: ${env:INFURA_PROJECT_ID}
+    PRIVATE_KEY: ${env:PRIVATE_KEY}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:PutItem"  # Allow Lambda to add items to DynamoDB
+        - "dynamodb:GetItem"  # Allow Lambda to retrieve items (optional)
+        - "dynamodb:UpdateItem"  # Allow Lambda to update items (optional)
+      Resource: "arn:aws:dynamodb:us-east-1:863518452400:table/UsersTable"  # Replace with your table ARN
+
+
+functions:
+  sendEth:
+    handler: handler.sendEth
+    timeout: 60
+    events:
+      - http:
+          path: send-eth
+          method: post
+          cors: true
+  addUserIds:
+    handler: add_users.addUserIds
+    events:
+      - http:
+          path: add-users
+          method: post
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: UsersTable
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5  
+          WriteCapacityUnits: 5 
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+
+custom:
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      seed: true
+      convertEmptyValues: true
+    stages:
+      - dev
+  plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
