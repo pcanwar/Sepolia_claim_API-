@@ -11,10 +11,10 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action:
-        - "dynamodb:PutItem"  # Allow Lambda to add items to DynamoDB
-        - "dynamodb:GetItem"  # Allow Lambda to retrieve items (optional)
-        - "dynamodb:UpdateItem"  # Allow Lambda to update items (optional)
-      Resource: "arn:aws:dynamodb:us-east-1:863518452400:table/UsersTable"  # Replace with your table ARN
+        - "dynamodb:PutItem"  # Allow Lambda to add items to db
+        - "dynamodb:GetItem"  
+        - "dynamodb:UpdateItem" 
+      Resource: "arn:aws:dynamodb:us-east-1:_ID_:table/UsersTable"  
 
 
 functions:
